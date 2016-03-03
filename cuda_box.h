@@ -14,7 +14,17 @@
 class cudaBox
 {
 public:
-    __device__ cudaBox() {}
+    __host__ __device__ cudaBox(float width, float height, float depth)
+    {
+        float tmp = fmaxf(width, fmaxf(height, depth));
+        width /= tmp;
+        height /= tmp;
+        depth /= tmp;
+
+        top = make_float3(width, height, depth) * 0.5f;
+        bottom = make_float3(width, height,depth) * -0.5f;
+        invSize = 1.f / (top - bottom);
+    }
 
     __device__ bool Intersect(const cudaRay& ray, float* tNear, float* tFar)
     {
