@@ -23,6 +23,8 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
 
+#include "cuda_utils.h"
+
 #define TABLE_SIZE 1024
 class TransferFunction : public QObject
 {
