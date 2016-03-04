@@ -3,8 +3,39 @@
 #include <qtextstream.h>
 #include <qfile.h>
 
+#include "cuda_utils.h"
+
+void chooseBestDevice()
+{
+    // choose the best device as the current device
+    int num_devices = 0;
+    int maxComputeCapability = 0;
+    CudaSafeCall(cudaGetDeviceCount(&num_devices));
+    printf("%d devices found on this platform:\n", num_devices);
+
+    int choice = 0;
+    for(int i = 0; i < num_devices; ++i)
+    {
+        cudaDeviceProp property;
+        CudaSafeCall(cudaGetDeviceProperties(&property, i));
+
+        char *name = property.name;
+        int computeCapability = property.major * 10 + property.minor;
+        printf("%d Device name: %s\t Compute capability: %d.%d\n", i, name, property.major, property.minor);
+
+        choice = maxComputeCapability > computeCapability ? choice : i;
+        maxComputeCapability = maxComputeCapability > computeCapability ? maxComputeCapability : computeCapability;
+    }
+
+    printf("Choice device %d\n", choice);
+    fflush(stdout);
+
+    CudaSafeCall(cudaSetDevice(choice));
+}
+
 int main(int argc, char *argv[])
 {
+    chooseBestDevice();
     QApplication a(argc, argv);
 
     // load stylesheet
