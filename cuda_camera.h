@@ -17,7 +17,7 @@ public:
     __host__ __device__ cudaCamera(const float3& _pos, const float3& _u, const float3& _v, const float3& _w, float fov, unsigned int _imageW,
                                    unsigned int _imageH)
     {
-        pos = pos;
+        pos = _pos;
         u = _u;
         v = _v;
         w = _w;
@@ -27,9 +27,9 @@ public:
         tanFovOverTwo = tanf(fov * 0.5f * M_PI / 180.f);
     }
 
-    __host__ __device__ cudaCamera(const float3& pos, const float3& target, const float3& up, float fov, unsigned int _imageW, unsigned int _imageH)
+    __host__ __device__ cudaCamera(const float3& _pos, const float3& target, const float3& up, float fov, unsigned int _imageW, unsigned int _imageH)
     {
-        pos = pos;
+        pos = _pos;
         w = normalize(pos - target);
         u = cross(v, w);
         v = cross(w, u);
@@ -37,12 +37,16 @@ public:
         imageH = _imageH;
         aspectRatio = (float)imageW / (float)imageH;
         tanFovOverTwo = tanf(fov * 0.5f * M_PI / 180.f);
+
+        printf("%f, %f, %f\n", u.x, u.y, u.z);
+        printf("%f, %f, %f\n", v.x, v.y, v.z);
+        printf("%f, %f, %f\n", w.x, w.y, w.z);
     }
 
-    __device__ void GenerateRay(unsigned int x, unsigned int y, curandState& rng, cudaRay* ray)
+    __device__ void GenerateRay(unsigned int x, unsigned int y, curandState* rng, cudaRay* ray) const
     {
-        float nx = 2.f * ((x + curand_uniform(rng)) / imageW) - 1.f;
-        float ny = 2.f * ((y + curand_uniform(rng)) / imageH) - 1.f;
+        float nx = 2.f * (((float)x + curand_uniform(rng)) / imageW) - 1.f;
+        float ny = 2.f * (((float)y + curand_uniform(rng)) / imageH) - 1.f;
 
         nx = nx * aspectRatio * tanFovOverTwo;
         ny = ny * tanFovOverTwo;
