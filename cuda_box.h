@@ -5,6 +5,8 @@
 #ifndef SUNVRVR_CUDA_BOX_H
 #define SUNVRVR_CUDA_BOX_H
 
+#include <stdio.h>
+
 #include <cuda.h>
 #include <cuda_runtime.h>
 
@@ -24,22 +26,25 @@ public:
         top = make_float3(width, height, depth) * 0.5f;
         bottom = make_float3(width, height,depth) * -0.5f;
         invSize = 1.f / (top - bottom);
+
+        //printf("box info:(%f, %f, %f) (%f, %f, %f)", bottom.x, bottom.y, bottom.z, top.x, top.y, top.z);
+        //fflush(stdout);
     }
 
-    __device__ bool Intersect(const cudaRay& ray, float* tNear, float* tFar)
+    __device__ bool Intersect(const cudaRay& ray, float* tNear, float* tFar) const
     {
         // compute intersection of ray with all six bbox planes
-        float3 invR = make_float3(1.0f, 1.0f, 1.0f) / ray.direction;
-        float3 tbot = invR * bottom - ray.orig;
-        float3 ttop = invR * top - ray.orig;
+        float3 invR = make_float3(1.0f, 1.0f, 1.0f) / ray.dir;
+        float3 tbot = invR * (bottom - ray.orig);
+        float3 ttop = invR * (top - ray.orig);
 
         // re-order intersections to find smallest and largest on each axis
         float3 tmin = fminf(tbot, ttop);
         float3 tmax = fmaxf(tbot, ttop);
 
         // find the largest tmin and the smallest tmax
-        float largest_tmin = fmaxf(fmaxf(tmin.x, tmin.y), fmaxf(tmin.x, tmin.z));
-        float smallest_tmax = fminf(fminf(tmax.x, tmax.y), fminf(tmax.x, tmax.z));
+        float largest_tmin = fmaxf(tmin.x, fmaxf(tmin.y, tmin.z));
+        float smallest_tmax = fminf(tmax.x, fminf(tmax.y, tmax.z));
 
         *tNear = largest_tmin;
         *tFar = smallest_tmax;
