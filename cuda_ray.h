@@ -10,6 +10,8 @@
 class cudaRay
 {
 public:
+    __device__ cudaRay(){}
+
     __device__ cudaRay(const float3& orig, const float3& dir)
     {
         this->orig = orig;
