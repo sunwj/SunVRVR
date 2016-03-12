@@ -60,13 +60,10 @@ __global__ void render_right(uchar4* img, const cudaBox volumeBox, const cudaCam
         img[offset] = make_uchar4(0, 255, 0, 255);
 }
 
-extern "C" void render3d(uchar4* leftImg, uchar4* rightImg, unsigned int frameNo)
+extern "C" void render3d(uchar4* leftImg, uchar4* rightImg, const cudaBox& volumeBox, const cudaCamera& camera, unsigned int frameNo)
 {
     dim3 blockSize(16, 16);
     dim3 gridSize(640 / blockSize.x, 640 / blockSize.y);
-
-    cudaBox volumeBox(1.f, 1.f, 1.f);
-    cudaCamera camera(make_float3(0.f, 0.f, 3.f), make_float3(1.f, 0.f, 0.f), make_float3(0.f, 1.f, 0.f), make_float3(0.f, 0.f, 1.f), 75.f, 640, 640);
 
     render_left<<<gridSize, blockSize>>>(leftImg, volumeBox, camera, frameNo);
     render_right<<<gridSize, blockSize>>>(rightImg, volumeBox, camera, frameNo);

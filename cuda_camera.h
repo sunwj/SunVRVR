@@ -14,7 +14,20 @@
 class cudaCamera
 {
 public:
+    __host__ __device__ cudaCamera(){}
+
     __host__ __device__ cudaCamera(const float3& _pos, const float3& _u, const float3& _v, const float3& _w, float fov, unsigned int _imageW,
+                                   unsigned int _imageH)
+    {
+        Setup(_pos, _u, _v, _w, fov, _imageW, _imageH);
+    }
+
+    __host__ __device__ cudaCamera(const float3& _pos, const float3& target, const float3& up, float fov, unsigned int _imageW, unsigned int _imageH)
+    {
+        Setup(_pos, target, up, fov, _imageW, _imageH);
+    }
+
+    __host__ __device__ void Setup(const float3& _pos, const float3& _u, const float3& _v, const float3& _w, float fov, unsigned int _imageW,
                                    unsigned int _imageH)
     {
         pos = _pos;
@@ -27,20 +40,16 @@ public:
         tanFovOverTwo = tanf(fov * 0.5f * M_PI / 180.f);
     }
 
-    __host__ __device__ cudaCamera(const float3& _pos, const float3& target, const float3& up, float fov, unsigned int _imageW, unsigned int _imageH)
+    __host__ __device__ void Setup(const float3& _pos, const float3& target, const float3& up, float fov, unsigned int _imageW, unsigned int _imageH)
     {
         pos = _pos;
         w = normalize(pos - target);
-        u = cross(v, w);
+        u = cross(up, w);
         v = cross(w, u);
         imageW = _imageW;
         imageH = _imageH;
         aspectRatio = (float)imageW / (float)imageH;
         tanFovOverTwo = tanf(fov * 0.5f * M_PI / 180.f);
-
-        printf("%f, %f, %f\n", u.x, u.y, u.z);
-        printf("%f, %f, %f\n", v.x, v.y, v.z);
-        printf("%f, %f, %f\n", w.x, w.y, w.z);
     }
 
     __device__ void GenerateRay(unsigned int x, unsigned int y, curandState* rng, cudaRay* ray) const

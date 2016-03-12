@@ -31,6 +31,9 @@ private:
     cudaGraphicsResource* rightResource;
     uchar4* leftImg;
     uchar4* rightImg;
+
+    cudaBox volumeBox;
+    cudaCamera camera;
 };
 
 

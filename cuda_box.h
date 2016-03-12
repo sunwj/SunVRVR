@@ -16,7 +16,14 @@
 class cudaBox
 {
 public:
+    __host__ __device__ cudaBox(){}
+
     __host__ __device__ cudaBox(float width, float height, float depth)
+    {
+        Build(width, height, depth);
+    }
+
+    __host__ __device__ void Build(float width, float height, float depth)
     {
         float tmp = fmaxf(width, fmaxf(height, depth));
         width /= tmp;
@@ -26,9 +33,6 @@ public:
         top = make_float3(width, height, depth) * 0.5f;
         bottom = make_float3(width, height,depth) * -0.5f;
         invSize = 1.f / (top - bottom);
-
-        //printf("box info:(%f, %f, %f) (%f, %f, %f)", bottom.x, bottom.y, bottom.z, top.x, top.y, top.z);
-        //fflush(stdout);
     }
 
     __device__ bool Intersect(const cudaRay& ray, float* tNear, float* tFar) const

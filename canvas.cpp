@@ -49,14 +49,6 @@ void Canvas::resizeGL(int w, int h)
 void Canvas::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT);
-    /*glBegin(GL_TRIANGLES);
-    glColor3f(1.f, 1.f, 1.f);
-    glVertex2d(0.f, 0.5f);
-    glColor3f(1.f, 1.f, 1.f);
-    glVertex2d(0.5f, -0.5f);
-    glColor3f(1.f, 1.f, 1.f);
-    glVertex2d(-0.5f, -0.5f);
-    glEnd();*/
 
     size_t size;
     CudaSafeCall(cudaGraphicsMapResources(1, &leftResource, 0));
@@ -64,7 +56,10 @@ void Canvas::paintGL()
     CudaSafeCall(cudaGraphicsMapResources(1, &rightResource, 0));
     CudaSafeCall(cudaGraphicsResourceGetMappedPointer((void**)&rightImg, &size, rightResource));
 
-    render3d(leftImg, rightImg, 0);
+    volumeBox.Build(1.f, 1.f, 1.f);
+    camera.Setup(make_float3(0.f, 0.f, 2.f), make_float3(0.f, 0.f, 0.f), make_float3(0.f, 1.f, 0.f), 45.f, 640, 640);
+
+    render3d(leftImg, rightImg, volumeBox, camera, 0);
     CudaSafeCall(cudaDeviceSynchronize());
 
     CudaSafeCall(cudaGraphicsUnmapResources(1, &leftResource, 0));

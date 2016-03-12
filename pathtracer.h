@@ -8,6 +8,6 @@
 #include "cuda_camera.h"
 #include "cuda_box.h"
 
-extern "C" void render3d(uchar4* leftImg, uchar4* rightImg, unsigned int frameNo);
+extern "C" void render3d(uchar4* leftImg, uchar4* rightImg, const cudaBox& volumeBox, const cudaCamera& camera, unsigned int frameNo);
 
 #endif //SUNVRVR_PATHTRACER_H
