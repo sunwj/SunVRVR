@@ -44,7 +44,7 @@ __global__ void render_left(uchar4* img, const cudaBox volumeBox, const cudaCame
 
 __global__ void render_right(uchar4* img, const cudaBox volumeBox, const cudaCamera camera, unsigned int hashedFrameNo)
 {
-    auto idx = blockDim.x * blockIdx.x + threadIdx.x;
+    /*auto idx = blockDim.x * blockIdx.x + threadIdx.x;
     auto idy = blockDim.y * blockIdx.y + threadIdx.y;
     auto offset = idy * 640 + idx;
     curandState rng;
@@ -57,7 +57,7 @@ __global__ void render_right(uchar4* img, const cudaBox volumeBox, const cudaCam
      if(!volumeBox.Intersect(ray, &tNear, &tFar))
          img[offset] = make_uchar4(0, 0, 0, 0);
      else
-        img[offset] = make_uchar4(0, 255, 0, 255);
+        img[offset] = make_uchar4(0, 255, 0, 255);*/
 }
 
 extern "C" void render3d(uchar4* leftImg, uchar4* rightImg, const cudaBox& volumeBox, const cudaCamera& camera, unsigned int frameNo)
